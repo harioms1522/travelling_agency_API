@@ -290,6 +290,9 @@ const deleteTourById = async function (req, res) {
   }
 };
 
+// ///////////////////////////////////////////////////////////////
+// Statistic Handlers
+
 const getTourStats = async function (req, res) {
   console.log("hello");
   try {
@@ -321,6 +324,44 @@ const getTourStats = async function (req, res) {
   }
 };
 
+const getMonthPlan = async function (req, res) {
+  const year = req.params.year * 1;
+  try {
+    const plan = await Tour.aggregate([
+      { $project: { _id: 0, name: 1, startDates: 1 } },
+      { $unwind: "$startDates" },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year},1,1`),
+            $lte: new Date(`${year},12,31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$startDates" },
+          count: { $sum: 1 },
+          tours: { $push: "$name" },
+        },
+      },
+      { $addFields: { month: "$_id" } },
+      { $project: { _id: 0 } },
+      { $sort: { count: 1 } },
+    ]);
+    res.status(200).json({
+      staus: "Success",
+      message: "Statistical Info Descriptive",
+      data: { plan },
+    });
+  } catch (err) {
+    res.status(403).json({
+      staus: "Not Created",
+      data: { err },
+    });
+  }
+};
+
 module.exports = {
   getAllTours,
   createTour,
@@ -329,6 +370,7 @@ module.exports = {
   deleteTourById,
   topCheapTourHandler,
   getTourStats,
+  getMonthPlan,
   // checkId,
   checkBody,
 };

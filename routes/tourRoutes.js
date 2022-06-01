@@ -12,6 +12,7 @@ const {
   deleteTourById,
   topCheapTourHandler,
   getTourStats,
+  getMonthPlan,
   // checkId,
   // checkBody, // important for middleware chaining and to check posr requests
 } = tourController;
@@ -28,6 +29,9 @@ router.route("/top-cheapest-5").get(topCheapTourHandler, getAllTours);
 // ** STATS TOUR**
 // Aggregation Pipeline
 router.route("/tour-stats").get(getTourStats);
+
+// Aggregation for the monthwise detail
+router.route("/tour-plan/:year").get(getMonthPlan);
 
 // **ROUTES**
 router.route("/").get(getAllTours).post(createTour);
