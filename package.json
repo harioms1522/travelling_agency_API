@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "start:prod": " set NODE_ENV=production && nodemon server.js"
+    "start:prod": " set NODE_ENV=production && nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "Hariom",
   "license": "ISC",
@@ -15,7 +16,10 @@
     "express": "^4.18.0",
     "mongoose": "^5.13.14",
     "morgan": "^1.10.0",
-    "package.json": "^2.0.1"
+    "ndb": "^1.1.5",
+    "package.json": "^2.0.1",
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "eslint": "^8.14.0",
