@@ -2,27 +2,28 @@
 // Module imports
 const express = require("express");
 
-const {
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUserById,
-  deleteUserById,
-} = require(`${__dirname}/../controllers/userController`);
-// Since we have now two resources we can get sub applicatiosn for them or the routers
+// controllers
+const userController = require(`${__dirname}/../controllers/userController`);
+const authController = require("../controllers/authController")
+
+
 const router = express.Router(); // this is like a middleware so we have to use it with the main app in different paths
 
-//middleware
-router.param("id", (req, res, next, val) => {
-  console.log(val);
-  next();
-});
+// Routes related to auth
+router.post("/signup", authController.signup)
+router.post("/login", authController.login)
 
-router.route("/").get(getAllUsers).post(createUser);
+
+// For all resource
 router
+  .route("/")
+  .get(userController.getAllUsers)
+  .post(userController.createUser);
+// Select resource 
+  router
   .route("/:id")
-  .get(getUserById)
-  .patch(updateUserById)
-  .delete(deleteUserById);
+  .get(userController.getUserById)
+  .patch(userController.updateUserById)
+  .delete(userController.deleteUserById);
 
 module.exports = router;

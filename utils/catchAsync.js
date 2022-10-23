@@ -5,8 +5,7 @@
     and this returned function then called the parameter function and the catch is used on this and transferred to the error handling route
 */
 
-module.exports = fn => {
-    return (req, res, next) => {
+module.exports = fn => (req, res, next) => {
       fn(req, res, next).catch(next);
     };
-  };
+  ;
