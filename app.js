@@ -1,6 +1,10 @@
 // core modules
 const express = require("express");
 const morgan = require("morgan");
+const AppError = require("./utils/appError")
+
+// controllers
+const globalErrorHandler = require("./controllers/errorController")
 
 // Custom Modules
 const tourRouter = require("./routes/tourRoutes");
@@ -30,41 +34,12 @@ app.use((req, res, next) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tours", tourRouter);
 
+// all other routs and all other htttp requests on then should return to 404 page
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Error handling middleware is to be defined in the end
+app.use(globalErrorHandler);
+
 module.exports = app;
-
-///////////////////////////////////////////////////////////////////////////////////////
-// Notes
-
-// get method
-// app.get("/", (req, res) => {
-//   res.status(200).json({ message: "Hello There", natour: "API" });
-// });
-
-// app.post("/", (req, res) => {
-//   res.status(200).json({
-//     message: "Got the post requestb",
-//   });
-// });
-
-// Don't read data in the route handler
-// Event loop will be stuck
-
-// Route for all the tours data
-// app.get("/api/v1/tours", getAllTours);
-// //TO show a single tour
-// app.get("/api/v1/tours/:id/:x?", getTourById);
-// //Tour Creation
-// app.post("/api/v1/tours", createTour);
-// //update a tour by ID
-// app.patch("/api/v1/tours/:id", updateTourById);
-
-// ALternative way to have to routs
-// app.route("/api/v1/tours").get(getAllTours).post(createTour);
-// app.route("/api/v1/tours/:id").get(getTourById).patch(updateTourById);
-
-// app.route("/api/v1/users").get(getAllUsers).post(createUser);
-// app
-//   .route("/api/v1/users/:id")
-//   .get(getUserById)
-//   .delete(deleteUserById)
-//   .patch(updateUserById);
