@@ -12,6 +12,8 @@ const router = express.Router(); // this is like a middleware so we have to use 
 // Routes related to auth
 router.post("/signup", authController.signup)
 router.post("/login", authController.login)
+router.post("/forgotPassword", authController.forgotPassword)
+router.post("/resetPassword/:token", authController.resetPassword)
 
 
 // For all resource

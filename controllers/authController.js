@@ -3,9 +3,11 @@ const {promisify} = require("util")
 
 const catchAsync = require("../utils/catchAsync")
 const AppError = require("../utils/appError")
+const sendEmail = require("../utils/email")
  
 // models
 const User = require("../models/userModel")
+const { nextTick } = require("process")
 
 // 
 const signToken = id => jwt.sign({id}, process.env.JWT_SECRET, {
@@ -98,4 +100,25 @@ exports.restrictTo = function(...roles){
         }
         next()
     }
+}
+
+exports.forgotPassword = catchAsync(async (req, res, next)=>{
+    // 1) get user based on email
+    const user = await User.findOne({email: req.body.email})
+    if(!user){
+        return next(new AppError("There is no user with this email address", 404))
+    }
+
+    // 2) generate token 
+    const resetToken = user.createPasswordResetToken()
+    // We modified data here we should now save it as well
+    // Now mongose will want use to give all the data before saving it because of validations like password
+    await user.save({ validateBeforeSave: false })
+
+
+    // 3) send it back as an email
+    
+})
+exports.resetPassword = (req, res, next) => {
+    
 }
