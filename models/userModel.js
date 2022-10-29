@@ -15,6 +15,13 @@ const userSchema = new mongoose.Schema({
         validate:[validator.isEmail,"Please provide a valid email."]
     },
     photo: String,
+
+    role:{
+        type:String,
+        enum:["user", "guide", "lead-gudide", "admin"],
+        default: 'user'
+    },
+
     password: {
         type: String,
         required:[true, "Provide a password"],
@@ -33,7 +40,8 @@ const userSchema = new mongoose.Schema({
             },
             message:"Confirm Password doesn't match password!"
         },
-    }
+    },
+    passwordChangedAt : Date
 })
 
 // Mongoose middlewares
@@ -54,6 +62,13 @@ userSchema.methods.correctPass = async function(clientPass, passDB){
     return await bcrypt.compare(clientPass, passDB)
 }
 
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
+    if(this.passwordChangedAt){
+        const changedTime = parseInt(this.passwordChangedAt.getTime()/100, 10)
+        return JWTTimestamp < changedTime 
+    }
+    return false
+}
 
 
 

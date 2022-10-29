@@ -11,7 +11,6 @@ const {
   createTour,
   getTourById,
   updateTourById,
-  deleteTourById,
   topCheapTourHandler,
   getTourStats,
   getMonthPlan,
@@ -44,6 +43,6 @@ router
   .route("/:id")
   .get(getTourById)
   .patch(updateTourById)
-  .delete(deleteTourById);
+  .delete(authController.protect, authController.restrictTo("lead-guide", "admin"), tourController.deleteTourById);
 
 module.exports = router;

@@ -17,7 +17,8 @@ exports.signup =  catchAsync(async (req,res,next)=>{
         name:req.body.name,
         email: req.body.email,
         password:req.body.password,
-        passwordConfirm : req.body.passwordConfirm 
+        passwordConfirm : req.body.passwordConfirm,
+        role: req.body.role
     })
 
     // Sign a token
@@ -42,7 +43,7 @@ exports.login = catchAsync(async (req,res,next)=>{
 
     // 2) user exists and password is correct
 
-    // We are explicetly getting the password field 
+    // We are explicetly getting the password field || select : false in model
     const user = await User.findOne({email}).select("+password")
 
     if(!user || ! await user.correctPass(password, user.password)){
@@ -66,22 +67,35 @@ exports.protect = catchAsync(async (req,res,next)=>{
      if(req.headers.authorization && req.headers.authorization.startsWith("Bearer")){
         token = req.headers.authorization.split(" ")[1]
      }
-
     // 2) verify token
     if(!token){
         return next(new AppError("Not logged in! Please log in", 401))
     }
 
     // callback based function so we should promisify it
-
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
-    console.log(decoded)
-
 
     // 3) check if user still exists
-
+    const freshUser = await User.findById(decoded.id)
+    if(!freshUser){
+        return next(new AppError("User that belongs to the token, doesn't exists!", 401))
+    }
 
     // 4) check if user changed pass after the token was issued
+    if(freshUser.changedPasswordAfter(decoded.iat)){
+        return next(new AppError("Password was already changed! Please log in again", 401))
+    }
 
+    req.user = freshUser
     next()
 })
+
+// Authorization:
+exports.restrictTo = function(...roles){
+    return (req,res,next) => {
+        if(!roles.includes(req.user.role)){
+            return next(new AppError("You are not allowed to perform this action", 403))
+        }
+        next()
+    }
+}

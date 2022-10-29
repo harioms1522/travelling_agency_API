@@ -277,6 +277,7 @@ const updateTourById = async function (req, res) {
 const deleteTourById = async function (req, res) {
   try {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
+    console.log("here")
     res.status(204).json({
       staus: "Success",
       message: "Successfully deleted the tour",
@@ -284,7 +285,7 @@ const deleteTourById = async function (req, res) {
     });
   } catch (err) {
     res.status(403).json({
-      staus: "Not Created",
+      staus: "Not deleted",
       data: { err },
     });
   }

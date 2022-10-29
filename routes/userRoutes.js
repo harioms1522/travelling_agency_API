@@ -20,7 +20,7 @@ router
   .get(userController.getAllUsers)
   .post(userController.createUser);
 // Select resource 
-  router
+router
   .route("/:id")
   .get(userController.getUserById)
   .patch(userController.updateUserById)
